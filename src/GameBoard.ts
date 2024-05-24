@@ -1,4 +1,4 @@
-type Player = { name: string; wins: number; marker: string };
+import { Player } from "./Player";
 
 export class GameBoard {
   board: string[];
@@ -20,9 +20,9 @@ export class GameBoard {
   }
 
   addMaker(player: Player, position: number) {
-    const validmove = this.isValidMove(this.board[position]);
+    const validMove = this.isValidMove(this.board[position]);
 
-    if (validmove) {
+    if (validMove) {
       this.marker = player.marker;
       this.board[position] = this.marker;
       //TODO Add a function for the aiplayer to add a marker
@@ -39,7 +39,7 @@ export class GameBoard {
   }
 
   checkWin() {
-    const winningCombinantions = [
+    const winningCombinations = [
       [0, 1, 2],
       [3, 4, 5],
       [6, 7, 8],
@@ -50,7 +50,7 @@ export class GameBoard {
       [2, 5, 6],
     ];
 
-    for (const winningCombination of winningCombinantions) {
+    for (const winningCombination of winningCombinations) {
       const [a, b, c] = winningCombination;
       const { board } = this;
 
