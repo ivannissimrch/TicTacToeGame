@@ -19,7 +19,7 @@ export class GameBoard {
     return boardPositionValue === "";
   }
 
-  addMaker(player: Player, position: number) {
+  addMarker(player: Player, position: number) {
     const validMove = this.isValidMove(this.board[position]);
 
     if (validMove) {
