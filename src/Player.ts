@@ -6,7 +6,7 @@ export class Player {
   constructor(name: string) {
     this.name = name;
     this.wins = 0;
-    this.marker = name === "player1" ? "x" : "o";
+    this.marker = name === "player1" ? "X" : "O";
   }
 
   addWin() {

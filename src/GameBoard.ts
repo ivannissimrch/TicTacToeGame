@@ -21,14 +21,14 @@ export class GameBoard {
 
   addMarker(player: Player, position: number) {
     const validMove = this.isValidMove(this.board[position]);
-
     if (validMove) {
       this.marker = player.marker;
       this.board[position] = this.marker;
+
       //TODO Add a function for the aiplayer to add a marker
     } else {
       console.log("invalid move");
-      return;
+      //return invalid move message to handle this on ui?
     }
   }
 
@@ -47,21 +47,18 @@ export class GameBoard {
       [1, 4, 7],
       [2, 5, 8],
       [0, 4, 8],
-      [2, 5, 6],
+      [2, 4, 6],
     ];
 
     for (const winningCombination of winningCombinations) {
       const [a, b, c] = winningCombination;
       const { board } = this;
-
       if (board[a] !== "" && board[a] === board[b] && board[a] === board[c]) {
         this.winner = board[a];
-        return `winner is ${this.winner}`;
-      }
-      const isBoardFull = this.board.every((cell) => cell !== "");
-      if (isBoardFull) {
-        return "Draw";
+        return this.winner;
       }
     }
+    const isBoardFull = this.board.every((cell) => cell !== "");
+    return isBoardFull ? "Draw" : undefined;
   }
 }

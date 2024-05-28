@@ -2,26 +2,94 @@ import "./style.css";
 import { GameBoard } from "./GameBoard";
 import { Player } from "./Player";
 
-const newGameBoard = new GameBoard();
-const player1 = new Player("player1");
-const player2 = new Player("aiPlayer");
+function renderBoard(boardElement: HTMLDivElement, boardData: string[]) {
+  boardElement.innerHTML = boardData
+    .map(
+      (cell: string, index: number) =>
+        `<div class='cell' id='cell${index}'>${cell}</div>`
+    )
+    .join("");
+}
 
-newGameBoard.addMarker(player1, 2);
-newGameBoard.addMarker(player2, 1);
-newGameBoard.addMarker(player1, 5);
+function resetGame(): void {
+  currentGameBoard.resetBoard();
+  renderBoard(gameBoardUI, currentGameBoard.board);
+  gameResultMessage.innerHTML = "";
+  gameBoardUI.addEventListener("click", handlePlayerMove);
+  restartButton.classList.add("hideButton");
+  restartButton.classList.remove("showButton");
+}
 
-newGameBoard.addMarker(player2, 3);
-newGameBoard.addMarker(player1, 8);
-// newGameBoard.addMarker(player2, 5);
-// newGameBoard.addMarker(player1, 6);
-// newGameBoard.addMarker(player2, 7);
-// newGameBoard.addMarker(player1, 0);
+function checkGameStatus() {
+  let win = currentGameBoard.checkWin();
 
-const win = newGameBoard.checkWin();
+  if (win === "X") {
+    gameResultMessage.innerHTML = "Player 1 Wins";
+    gameBoardUI.removeEventListener("click", handlePlayerMove);
+    restartButton.classList.add("showButton");
+    restartButton.classList.remove("hideButton");
+    return;
+  } else if (win === "Draw") {
+    gameResultMessage.innerHTML = "Draw";
+    gameBoardUI.removeEventListener("click", handlePlayerMove);
+    restartButton.classList.add("showButton");
+    restartButton.classList.remove("hideButton");
+    return;
+  }
+}
 
-document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
-  <div>   
-  ${newGameBoard.board}
-  <h2>${win}</h2> 
-  </div>
-`;
+function handlePlayerMove(event: MouseEvent | null) {
+  const cellClicked: HTMLDivElement = event!.target as HTMLDivElement;
+  const cellClickedPosition: number = parseInt(
+    cellClicked.id.split("").slice(4).join("")
+  );
+
+  if (cellClicked.innerText !== "") {
+    return;
+  }
+  currentGameBoard.addMarker(humanPlayer, cellClickedPosition);
+  cellClicked.innerHTML = "X";
+
+  checkGameStatus();
+  if (gameResultMessage.innerHTML !== "") {
+    return;
+  }
+
+  //AIPlayer pass only the player and implement logic of ai on gameboard, I might replace this..
+  const aiCellClicked: HTMLDivElement = document.getElementById(
+    `cell${cellClickedPosition + 1}`
+  ) as HTMLDivElement;
+  if (aiCellClicked.innerText !== "") {
+    return;
+  }
+  currentGameBoard.addMarker(aiPlayer, cellClickedPosition + 1);
+
+  aiCellClicked.innerHTML = "O";
+  checkGameStatus();
+}
+
+const currentGameBoard = new GameBoard();
+const humanPlayer = new Player("player1");
+const aiPlayer = new Player("aiPlayer");
+
+const gameBoardUI: HTMLDivElement = document.createElement("div");
+gameBoardUI.id = "board";
+gameBoardUI.addEventListener("click", handlePlayerMove);
+
+const gameResultMessage: HTMLHeadElement = document.createElement("h2");
+gameResultMessage.id = "resultMessage";
+
+const restartButton: HTMLButtonElement = document.createElement(
+  "Button"
+) as HTMLButtonElement;
+restartButton.id = "restartButton";
+restartButton.textContent = "Restart";
+restartButton.classList.add("hideButton");
+restartButton.addEventListener("click", resetGame);
+
+const app: HTMLDivElement = document.querySelector("#app") as HTMLDivElement;
+app.innerHTML = `<h1 id='title'>Tic Tac Toe</h1>`;
+app.appendChild(gameBoardUI);
+app.appendChild(gameResultMessage);
+app.appendChild(restartButton);
+renderBoard(gameBoardUI, currentGameBoard.board);
