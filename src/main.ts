@@ -1,27 +1,47 @@
+//Controller
 import "./style.css";
-import { GameBoard } from "./GameBoard";
-import { Player } from "./Player";
+import { GameBoard } from "./Logic/GameBoard";
+import { Player } from "./Logic/Player";
+import { UI } from "./UI/UI";
 
-const newGameBoard = new GameBoard();
-const player1 = new Player("player1");
-const player2 = new Player("aiPlayer");
+function displayGameResult(gameStatus: string) {
+  gameBoardUI.gameResultMessage.textContent = `${
+    gameStatus === "Draw" ? "Draw" : `${gameStatus} Wins`
+  }`;
+  gameBoardUI.gameResultMessage.classList.remove("hideElement");
+  gameBoardUI.gameBoardUI.removeEventListener("click", checkGameStatus);
+  gameBoardUI.restartButton.classList.remove("hideElement");
+}
 
-newGameBoard.addMarker(player1, 2);
-newGameBoard.addMarker(player2, 1);
-newGameBoard.addMarker(player1, 5);
+function checkGameStatus(event: MouseEvent) {
+  const cellClickedHumanPlayer: number = parseInt(
+    (event.target as HTMLDivElement).id.split("").slice(4).join("")
+  );
+  const isValidMove: { status: boolean; message: string } =
+    currentGameBoard.addMarker(humanPlayer, cellClickedHumanPlayer);
+  //probably addMaker should just return a boolean value?
+  if (!isValidMove.status) return;
 
-newGameBoard.addMarker(player2, 3);
-newGameBoard.addMarker(player1, 8);
-// newGameBoard.addMarker(player2, 5);
-// newGameBoard.addMarker(player1, 6);
-// newGameBoard.addMarker(player2, 7);
-// newGameBoard.addMarker(player1, 0);
+  let gameStatus = currentGameBoard.checkGameStatus();
+  gameBoardUI.renderBoard(currentGameBoard.board);
+  if (gameStatus === undefined) {
+    //AI
+    const cellClickedAiPlayer = aiPlayer.aiBestMove(currentGameBoard);
+    currentGameBoard.addMarker(aiPlayer, cellClickedAiPlayer);
+    gameStatus = currentGameBoard.checkGameStatus();
+    gameStatus !== undefined && displayGameResult(gameStatus);
+    gameBoardUI.renderBoard(currentGameBoard.board);
+  } else {
+    displayGameResult(gameStatus);
+  }
+}
 
-const win = newGameBoard.checkWin();
-
-document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
-  <div>   
-  ${newGameBoard.board}
-  <h2>${win}</h2> 
-  </div>
-`;
+const currentGameBoard = new GameBoard();
+const gameBoardUI = new UI();
+const humanPlayer = new Player("player1");
+const aiPlayer = new Player("aiPlayer");
+gameBoardUI.renderBoard(currentGameBoard.board);
+gameBoardUI.gameBoardUI.addEventListener("click", checkGameStatus);
+gameBoardUI.restartButton.addEventListener("click", () =>
+  gameBoardUI.resetGame(currentGameBoard, checkGameStatus)
+);
