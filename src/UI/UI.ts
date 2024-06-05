@@ -1,12 +1,18 @@
 import { GameBoard } from "../Logic/GameBoard";
 
+
+interface Props {
+  onGameMove: (coordinate: number) => void;
+}
+
 export class UI {
+  onGameMove: Props['onGameMove'];
   gameBoardUI: HTMLDivElement;
   gameResultMessage: HTMLHeadingElement;
   app: HTMLDivElement;
   restartButton: HTMLButtonElement;
 
-  constructor() {
+  constructor({ onGameMove }: Props) {
     this.gameBoardUI = document.createElement("div");
     this.gameBoardUI.id = "board";
     this.gameResultMessage = document.createElement("h2");
@@ -23,6 +29,18 @@ export class UI {
     this.app.appendChild(this.gameBoardUI);
     this.app.appendChild(this.gameResultMessage);
     this.app.appendChild(this.restartButton);
+
+    this.onGameMove = onGameMove;
+    this.gameBoardUI.addEventListener("click", (event: MouseEvent) => {
+      const cellClickedHumanPlayer: number = parseInt(
+        (event.target as HTMLDivElement).id.substring(4)
+      );
+      this.onGameMove(cellClickedHumanPlayer);
+    });
+  }
+
+  hideRestartButton() {
+    this.restartButton.classList.remove("hideElement");
   }
 
   renderBoard(boardData: string[]) {

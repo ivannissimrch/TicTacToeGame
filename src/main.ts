@@ -10,14 +10,11 @@ function displayGameResult(gameStatus: string) {
   }`;
   gameBoardUI.gameResultMessage.classList.remove("hideElement");
   gameBoardUI.gameBoardUI.removeEventListener("click", checkGameStatus);
-  gameBoardUI.restartButton.classList.remove("hideElement");
+  gameBoardUI.hideRestartButton();
 }
 
-function checkGameStatus(event: MouseEvent) {
-  const cellClickedHumanPlayer: number = parseInt(
-    (event.target as HTMLDivElement).id.split("").slice(4).join("")
-  );
-  const isValidMove: { status: boolean; message: string } =
+function checkGameStatus(cellClickedHumanPlayer: number) {
+  const isValidMove: { status: boolean, message: string } =
     currentGameBoard.addMarker(humanPlayer, cellClickedHumanPlayer);
   //probably addMaker should just return a boolean value?
   if (!isValidMove.status) return;
@@ -37,11 +34,10 @@ function checkGameStatus(event: MouseEvent) {
 }
 
 const currentGameBoard = new GameBoard();
-const gameBoardUI = new UI();
+const gameBoardUI = new UI({ onGameMove: checkGameStatus });
 const humanPlayer = new Player("player1");
 const aiPlayer = new Player("aiPlayer");
 gameBoardUI.renderBoard(currentGameBoard.board);
-gameBoardUI.gameBoardUI.addEventListener("click", checkGameStatus);
 gameBoardUI.restartButton.addEventListener("click", () =>
   gameBoardUI.resetGame(currentGameBoard, checkGameStatus)
 );
