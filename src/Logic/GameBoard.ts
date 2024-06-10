@@ -15,15 +15,15 @@ export class GameBoard {
     this.winner = "";
   }
 
-  isValidMove(boardPositionValue: string): boolean {
-    return boardPositionValue === "";
+  isCellEmpty(cellValue: string): boolean {
+    return cellValue === "";
   }
 
   addMarker(
     player: Player,
     position: number
   ): { status: boolean; message: string } {
-    const validMove = this.isValidMove(this.board[position]);
+    const validMove = this.isCellEmpty(this.board[position]);
 
     if (validMove) {
       this.marker = player.marker;
