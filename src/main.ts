@@ -1,29 +1,28 @@
 //Controller
 import "./style.css";
-import { GameBoard } from "./Logic/GameBoard";
+import { GameBoard, Position, Result } from "./Logic/GameBoard";
 import { Player } from "./Logic/Player";
 import { UI } from "./UI/UI";
 
 function checkGameStatus(cellClickedHumanPlayer: number) {
+  //maybe make 2 methods one to check if cell is empty and then one to add marker?
   const isValidMove = currentGameBoard.addMarker(
     humanPlayer,
     cellClickedHumanPlayer
   );
-  if (!isValidMove.status) return;
+  if (isValidMove === Position.INVALID) return;
 
   let gameStatus = currentGameBoard.checkGameStatus();
   gameBoardUI.renderBoard(currentGameBoard.board);
-  if (gameStatus === undefined) {
-    //AI
+  if (gameStatus === Result.GameInProgress) {
     const cellClickedAiPlayer = aiPlayer.aiBestMove(currentGameBoard);
     currentGameBoard.addMarker(aiPlayer, cellClickedAiPlayer);
     gameStatus = currentGameBoard.checkGameStatus();
     gameBoardUI.renderBoard(currentGameBoard.board);
   }
 
-  if (gameStatus !== undefined) {
+  if (gameStatus !== Result.GameInProgress) {
     gameBoardUI.displayGameResult(gameStatus);
-    currentGameBoard.resetBoard();
   }
 }
 
@@ -40,5 +39,4 @@ const gameBoardUI = new UI({
   onGameMove: checkGameStatus,
   resetGameBoard: resetGameStatus,
 });
-
 gameBoardUI.renderBoard(currentGameBoard.board);

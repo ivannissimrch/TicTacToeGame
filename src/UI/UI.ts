@@ -1,11 +1,14 @@
+import { Result } from "../Logic/GameBoard";
+import { Marker } from "../Logic/Player";
+
 interface Props {
-  gameBoard: string[];
+  gameBoard: Marker[];
   onGameMove: (coordinate: number) => void;
-  resetGameBoard: () => string[];
+  resetGameBoard: () => Marker[];
 }
 
 export class UI {
-  gameBoard: string[];
+  gameBoard: Marker[];
   onGameMove: Props["onGameMove"];
   resetGameBoard: Props["resetGameBoard"];
   gameBoardUI: HTMLDivElement;
@@ -41,10 +44,10 @@ export class UI {
     this.restartButton.addEventListener("click", this.resetGame);
   }
 
-  renderBoard(boardData: string[]) {
+  renderBoard(boardData: Marker[]) {
     this.gameBoardUI.innerHTML = boardData
       .map(
-        (cell: string, index: number) =>
+        (cell: Marker, index: number) =>
           `<div class ='cell' id='cell${index}'>${cell}</div>`
       )
       .join("");
@@ -61,9 +64,9 @@ export class UI {
     this.restartButton.classList.remove("hideElement");
   }
 
-  displayGameResult(gameStatus: string) {
+  displayGameResult(gameStatus: Result | Marker) {
     this.gameResultMessage.textContent = `${
-      gameStatus === "Draw" ? "Draw" : `${gameStatus} Wins`
+      gameStatus === Result.DRAW ? Result.DRAW : `${gameStatus} Wins`
     }`;
     this.gameResultMessage.classList.remove("hideElement");
     this.gameBoardUI.removeEventListener("click", this.handlePlayer1Click);
