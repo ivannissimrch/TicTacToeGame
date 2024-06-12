@@ -29,7 +29,7 @@ function checkGameStatus(cellClickedHumanPlayer: number) {
 
 function resetGameStatus() {
   currentGameBoard.resetBoard();
-  return currentGameBoard.board;
+  gameBoardUI.resetGame(currentGameBoard.board);
 }
 
 const humanPlayer = new Player("player1");
@@ -38,7 +38,7 @@ const currentGameBoard = new GameBoard();
 const gameBoardUI = new UI({
   gameBoard: currentGameBoard.board,
   onGameMove: checkGameStatus,
-  resetGameBoard: resetGameStatus,
+  onRestart: resetGameStatus,
 });
 
 gameBoardUI.renderBoard(currentGameBoard.board);

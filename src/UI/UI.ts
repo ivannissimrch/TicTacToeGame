@@ -1,19 +1,19 @@
 interface Props {
   gameBoard: string[];
   onGameMove: (coordinate: number) => void;
-  resetGameBoard: () => string[];
+  onRestart: () => void;
 }
 
 export class UI {
   gameBoard: string[];
   onGameMove: Props["onGameMove"];
-  resetGameBoard: Props["resetGameBoard"];
+  onRestart: Props["onRestart"];
   gameBoardUI: HTMLDivElement;
   gameResultMessage: HTMLHeadingElement;
   app: HTMLDivElement;
   restartButton: HTMLButtonElement;
 
-  constructor({ gameBoard, onGameMove, resetGameBoard }: Props) {
+  constructor({ gameBoard, onGameMove, onRestart }: Props) {
     this.gameBoardUI = document.createElement("div");
     this.gameBoardUI.id = "board";
     this.gameResultMessage = document.createElement("h2");
@@ -33,12 +33,11 @@ export class UI {
 
     this.gameBoard = gameBoard;
     this.onGameMove = onGameMove;
-    this.resetGameBoard = resetGameBoard;
+    this.onRestart = onRestart;
 
     this.handlePlayer1Click = this.handlePlayer1Click.bind(this);
     this.gameBoardUI.addEventListener("click", this.handlePlayer1Click);
-    this.resetGame = this.resetGame.bind(this);
-    this.restartButton.addEventListener("click", this.resetGame);
+    this.restartButton.addEventListener("click", this.onRestart);
   }
 
   renderBoard(boardData: string[]) {
@@ -70,12 +69,12 @@ export class UI {
     this.showRestartButton();
   }
 
-  resetGame() {
+  resetGame(boardData: string[]) {
+    this.gameBoard = boardData;
     this.gameResultMessage.textContent = "Game in progress";
     this.gameBoardUI.addEventListener("click", this.handlePlayer1Click);
     this.restartButton.classList.add("hideElement");
     this.gameResultMessage.classList.add("hideElement");
-    this.gameBoard = this.resetGameBoard();
     this.renderBoard(this.gameBoard);
   }
 }
