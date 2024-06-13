@@ -1,12 +1,19 @@
-import { GameBoard } from "../Logic/GameBoard";
+interface Props {
+  gameBoard: string[];
+  onGameMove: (coordinate: number) => void;
+  onRestart: () => void;
+}
 
 export class UI {
+  gameBoard: string[];
+  onGameMove: Props["onGameMove"];
+  onRestart: Props["onRestart"];
   gameBoardUI: HTMLDivElement;
   gameResultMessage: HTMLHeadingElement;
   app: HTMLDivElement;
   restartButton: HTMLButtonElement;
 
-  constructor() {
+  constructor({ gameBoard, onGameMove, onRestart }: Props) {
     this.gameBoardUI = document.createElement("div");
     this.gameBoardUI.id = "board";
     this.gameResultMessage = document.createElement("h2");
@@ -23,6 +30,14 @@ export class UI {
     this.app.appendChild(this.gameBoardUI);
     this.app.appendChild(this.gameResultMessage);
     this.app.appendChild(this.restartButton);
+
+    this.gameBoard = gameBoard;
+    this.onGameMove = onGameMove;
+    this.onRestart = onRestart;
+
+    this.handlePlayer1Click = this.handlePlayer1Click.bind(this);
+    this.gameBoardUI.addEventListener("click", this.handlePlayer1Click);
+    this.restartButton.addEventListener("click", this.onRestart);
   }
 
   renderBoard(boardData: string[]) {
@@ -34,15 +49,32 @@ export class UI {
       .join("");
   }
 
-  resetGame(
-    currentGameBoard: GameBoard,
-    checkGameStatus: (event: MouseEvent) => void
-  ) {
-    currentGameBoard.resetBoard();
-    this.renderBoard(currentGameBoard.board);
+  handlePlayer1Click(event: MouseEvent) {
+    const cellClickedHumanPlayer: number = parseInt(
+      (event.target as HTMLDivElement).id.substring(4)
+    );
+    this.onGameMove(cellClickedHumanPlayer);
+  }
+
+  showRestartButton() {
+    this.restartButton.classList.remove("hideElement");
+  }
+
+  displayGameResult(gameStatus: string) {
+    this.gameResultMessage.textContent = `${
+      gameStatus === "Draw" ? "Draw" : `${gameStatus} Wins`
+    }`;
+    this.gameResultMessage.classList.remove("hideElement");
+    this.gameBoardUI.removeEventListener("click", this.handlePlayer1Click);
+    this.showRestartButton();
+  }
+
+  resetGame(boardData: string[]) {
+    this.gameBoard = boardData;
     this.gameResultMessage.textContent = "Game in progress";
-    this.gameBoardUI.addEventListener("click", checkGameStatus);
+    this.gameBoardUI.addEventListener("click", this.handlePlayer1Click);
     this.restartButton.classList.add("hideElement");
     this.gameResultMessage.classList.add("hideElement");
+    this.renderBoard(this.gameBoard);
   }
 }
